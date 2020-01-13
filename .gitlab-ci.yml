@@ -67,5 +67,27 @@ lib-build-windows:
     - copy /y "ReleaseX64\Release\zyre.*" "%DEPLOYMENT_WINDOWS_NET_SHARE%\Builds\Release\x64\"
     - copy /y "ReleaseX64\Release\libzyre.*" "%DEPLOYMENT_WINDOWS_NET_SHARE%\Builds\Release\x64\"
 
-
-
+# Create library for macos
+lib-build-macos:
+  <<: *lib-build-files
+  stage: lib-build
+  image: ingescape/debian-testing-compil
+  tags:
+    - docker
+  script:
+    - mkdir build
+    - mkdir release
+    - cmake -S . -B build -DCMAKE_BUILD_TYPE=Release -DENABLE_DRAFTS=ON -DCMAKE_PREFIX_PATH=$HOME/builds/release/linux_x64/usr/local/
+    - make -C build
+    - make -C build DESTDIR=$PWD/release install
+    - make -C build DESTDIR=$HOME/builds/release/linux_x64/ install
+    - cd release/usr/local/
+    - tar zcvf ../../../zyre.tgz *
+    - cd ../../..
+  artifacts:
+    paths:
+      - zyre.tgz
+    name: "lib-build-linux-x64"
+    expire_in: 1 day
+  dependencies: []
+  
