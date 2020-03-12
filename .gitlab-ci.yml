@@ -38,30 +38,25 @@ lib-build-windows:
   script:
     - IF (!$env:VS_VERSION_YEAR) { ECHO ">> VS_VERSION_YEAR must be defined on the Runner side <<" ; EXIT 1 }
     - IF (!$env:VS_VERSION_NUM) { ECHO ">> VS_VERSION_NUM must be defined on the Runner side <<" ; EXIT 1 }
-    - $env:INITIAL_PATH = "$env:PATH;$env:DEPLOYMENT_WINDOWS_NET_SHARE\Builds\include"
+    - $env:INITIAL_PATH = "$env:PATH"
     - mkdir build
     - cd build
     - $env:PATH="$env:INITIAL_PATH;$env:DEPLOYMENT_WINDOWS_NET_SHARE\Builds\Debug\x86"
     - cmake -S .. -B DebugX86 -G"Visual Studio $env:VS_VERSION_NUM $env:VS_VERSION_YEAR" -DENABLE_DRAFTS=ON -DZYRE_BUILD_STATIC=OFF
     - cmake --build DebugX86 --target ALL_BUILD --config Debug
+    - cmake --install DebugX86 --config Debug --prefix $env:DEPLOYMENT_WINDOWS_NET_SHARE\Builds\Debug\x86
     - $env:PATH="$env:INITIAL_PATH;$env:DEPLOYMENT_WINDOWS_NET_SHARE\Builds\Release\x86"
     - cmake -S .. -B ReleaseX86 -G"Visual Studio $env:VS_VERSION_NUM $env:VS_VERSION_YEAR" -DENABLE_DRAFTS=ON -DZYRE_BUILD_STATIC=OFF
     - cmake --build ReleaseX86 --target ALL_BUILD --config Release
+    - cmake --install ReleaseX86 --config Release --prefix $env:DEPLOYMENT_WINDOWS_NET_SHARE\Builds\Release\x86
     - $env:PATH="$env:INITIAL_PATH;$env:DEPLOYMENT_WINDOWS_NET_SHARE\Builds\Debug\x64"
     - cmake -S .. -B DebugX64 -G"Visual Studio $env:VS_VERSION_NUM $env:VS_VERSION_YEAR Win64" -DENABLE_DRAFTS=ON -DZYRE_BUILD_STATIC=OFF
     - cmake --build DebugX64 --target ALL_BUILD --config Debug
+    - cmake --install DebugX64 --config Debug --prefix $env:DEPLOYMENT_WINDOWS_NET_SHARE\Builds\Debug\x64
     - $env:PATH="$env:INITIAL_PATH;$env:DEPLOYMENT_WINDOWS_NET_SHARE\Builds\Release\x64"
     - cmake -S .. -B ReleaseX64 -G"Visual Studio $env:VS_VERSION_NUM $env:VS_VERSION_YEAR Win64" -DENABLE_DRAFTS=ON -DZYRE_BUILD_STATIC=OFF
     - cmake --build ReleaseX64 --target ALL_BUILD --config Release
-    - copy ..\include\*.h "$env:DEPLOYMENT_WINDOWS_NET_SHARE\Builds\include\" -Force
-    - copy "DebugX86\Debug\zyre.*" "$env:DEPLOYMENT_WINDOWS_NET_SHARE\Builds\Debug\x86\" -Force
-    - copy "DebugX86\Debug\libzyre.*" "$env:DEPLOYMENT_WINDOWS_NET_SHARE\Builds\Debug\x86\" -Force
-    - copy "ReleaseX86\Release\zyre.*" "$env:DEPLOYMENT_WINDOWS_NET_SHARE\Builds\Release\x86\" -Force
-    - copy "ReleaseX86\Release\libzyre.*" "$env:DEPLOYMENT_WINDOWS_NET_SHARE\Builds\Release\x86\" -Force
-    - copy "DebugX64\Debug\zyre.*" "$env:DEPLOYMENT_WINDOWS_NET_SHARE\Builds\Debug\x64\" -Force
-    - copy "DebugX64\Debug\libzyre.*" "$env:DEPLOYMENT_WINDOWS_NET_SHARE\Builds\Debug\x64\" -Force
-    - copy "ReleaseX64\Release\zyre.*" "$env:DEPLOYMENT_WINDOWS_NET_SHARE\Builds\Release\x64\" -Force
-    - copy "ReleaseX64\Release\libzyre.*" "$env:DEPLOYMENT_WINDOWS_NET_SHARE\Builds\Release\x64\" -Force
+    - cmake --install ReleaseX64 --config Release --prefix $env:DEPLOYMENT_WINDOWS_NET_SHARE\Builds\Release\x64
   only:
     refs:
       - master
