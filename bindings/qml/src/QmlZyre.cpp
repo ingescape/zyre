@@ -101,6 +101,8 @@ void QmlZyre::setInterval (size_t interval) {
 //  Set network interface for UDP beacons. If you do not set this, CZMQ will
 //  choose an interface for you. On boxes with several interfaces you should
 //  specify which one you want to use, or strange things can happen.
+//  The interface may by specified by either the interface name e.g. "eth0" or
+//  an IP address associalted with the interface e.g. "192.168.0.1"
 void QmlZyre::setInterface (const QString &value) {
     zyre_set_interface (self, value.toUtf8().data());
 };
@@ -293,6 +295,13 @@ int QmlZyre::requirePeer (const QString &uuid, const QString &endpoint, const QS
 //  Return socket for talking to the Zyre node, for polling
 zsock_t *QmlZyre::socket () {
     return zyre_socket (self);
+};
+
+///
+//  Return underlying ZMQ socket for talking to the Zyre node,
+//  for polling with libzmq (base ZMQ library)
+void *QmlZyre::socketZmq () {
+    return zyre_socket_zmq (self);
 };
 
 ///

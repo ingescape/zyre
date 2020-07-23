@@ -193,14 +193,33 @@ zyre_node_start (zyre_node_t *self)
         if (self->verbose)
             zsys_debug ("applying zcert to ->inbox");
 
-        uint8_t pub[32] = { 0 }, sec[32] = { 0 };
-        assert (zmq_z85_decode (pub, self->public_key));
-        assert (zmq_z85_decode (sec, self->secret_key));
-        zcert_t *cert = zcert_new_from(pub, sec);
+        assert (self->public_key);
+        assert (self->secret_key);
+
+        // zarmour use for string conversion
+        zarmour_t *armour = zarmour_new ();
+        zarmour_set_mode (armour, ZARMOUR_MODE_Z85);
+        zarmour_set_pad (armour, false);
+        zarmour_set_line_breaks (armour, false);
+
+        // convert keys from Z85 strings (40 bytes) to raw byte arrays (32 bytes)
+        zchunk_t *decoded_public_key =
+          zarmour_decode (armour, self->public_key);
+        zchunk_t *decoded_secret_key =
+          zarmour_decode (armour, self->secret_key);
+
+         // create zcert from the decoded keys
+        zcert_t *cert = zcert_new_from (zchunk_data (decoded_public_key),
+                                        zchunk_data (decoded_secret_key));
+
         zcert_apply(cert, self->inbox);
         zsock_set_curve_server (self->inbox, 1);
         zsock_set_zap_domain (self->inbox, self->zap_domain);
-        zcert_destroy(&cert);
+
+        zcert_destroy (&cert);
+        zchunk_destroy (&decoded_secret_key);
+        zchunk_destroy (&decoded_public_key);
+        zarmour_destroy (&armour);
     }
 
     if (self->beacon_port) {
@@ -513,14 +532,33 @@ zyre_node_recv_api (zyre_node_t *self)
             if (self->verbose)
                 zsys_debug ("applying zcert to ->inbox");
 
-            uint8_t pub[32] = { 0 }, sec[32] = { 0 };
-            assert (zmq_z85_decode (pub, self->public_key));
-            assert (zmq_z85_decode (sec, self->secret_key));
-            zcert_t *cert = zcert_new_from(pub, sec);
+            assert (self->public_key);
+            assert (self->secret_key);
+
+            // zarmour use for string conversion
+            zarmour_t *armour = zarmour_new ();
+            zarmour_set_mode (armour, ZARMOUR_MODE_Z85);
+            zarmour_set_pad (armour, false);
+            zarmour_set_line_breaks (armour, false);
+
+            // convert keys from Z85 strings (40 bytes) to raw byte arrays (32 bytes)
+            zchunk_t *decoded_public_key =
+              zarmour_decode (armour, self->public_key);
+            zchunk_t *decoded_secret_key =
+              zarmour_decode (armour, self->secret_key);
+
+            // create zcert from the decoded keys
+            zcert_t *cert = zcert_new_from (zchunk_data (decoded_public_key),
+                                            zchunk_data (decoded_secret_key));
+
             zcert_apply(cert, self->inbox);
             zsock_set_curve_server (self->inbox, 1);
             zsock_set_zap_domain (self->inbox, self->zap_domain);
-            zcert_destroy(&cert);
+
+            zcert_destroy (&cert);
+            zchunk_destroy (&decoded_secret_key);
+            zchunk_destroy (&decoded_public_key);
+            zarmour_destroy (&armour);
         }
         if (zsock_bind (self->inbox, "%s", endpoint) != -1) {
             zstr_free(&self->endpoint);
@@ -1279,7 +1317,8 @@ zyre_node_recv_beacon (zyre_node_t *self)
     if (beacon.version != self->beacon_version) {
         zstr_free (&ipaddress);
         if (self->verbose)
-            zsys_debug ("tossing beacon, version mis-match");
+            zsys_debug ("tossing beacon, version mis-match. Got %d but expected %d.", beacon.version, self->beacon_version);
+
         return;
     }
 
@@ -1535,5 +1574,8 @@ zyre_node_test (bool verbose)
     zyre_node_destroy (&node);
     zsock_destroy (&pipe);
     //  Node takes ownership of outbox and destroys it
+#if defined (__WINDOWS__)
+    zsys_shutdown();
+#endif
     printf ("OK\n");
 }

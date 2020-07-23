@@ -146,6 +146,8 @@ lib.zyre_require_peer.restype = c_int
 lib.zyre_require_peer.argtypes = [zyre_p, c_char_p, c_char_p, c_char_p]
 lib.zyre_socket.restype = czmq.zsock_p
 lib.zyre_socket.argtypes = [zyre_p]
+lib.zyre_socket_zmq.restype = c_void_p
+lib.zyre_socket_zmq.argtypes = [zyre_p]
 lib.zyre_print.restype = None
 lib.zyre_print.argtypes = [zyre_p]
 lib.zyre_version.restype = c_long
@@ -299,6 +301,8 @@ beacon exploration followed by pinging every 1,000 msecs.
         Set network interface for UDP beacons. If you do not set this, CZMQ will
 choose an interface for you. On boxes with several interfaces you should
 specify which one you want to use, or strange things can happen.
+The interface may by specified by either the interface name e.g. "eth0" or
+an IP address associalted with the interface e.g. "192.168.0.1"
         """
         return lib.zyre_set_interface(self._as_parameter_, value)
 
@@ -485,6 +489,13 @@ Returns null if peer or key doesn't exits.
         Return socket for talking to the Zyre node, for polling
         """
         return czmq.Zsock(lib.zyre_socket(self._as_parameter_), False)
+
+    def socket_zmq(self):
+        """
+        Return underlying ZMQ socket for talking to the Zyre node,
+for polling with libzmq (base ZMQ library)
+        """
+        return c_void_p(lib.zyre_socket_zmq(self._as_parameter_))
 
     def print(self):
         """

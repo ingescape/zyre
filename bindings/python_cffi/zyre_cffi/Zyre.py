@@ -121,6 +121,8 @@ class Zyre(object):
         Set network interface for UDP beacons. If you do not set this, CZMQ will
         choose an interface for you. On boxes with several interfaces you should
         specify which one you want to use, or strange things can happen.
+        The interface may by specified by either the interface name e.g. "eth0" or
+        an IP address associalted with the interface e.g. "192.168.0.1"
         """
         utils.lib.zyre_set_interface(self._p, utils.to_bytes(value))
 
@@ -307,6 +309,13 @@ class Zyre(object):
         Return socket for talking to the Zyre node, for polling
         """
         return utils.lib.zyre_socket(self._p)
+
+    def socket_zmq(self):
+        """
+        Return underlying ZMQ socket for talking to the Zyre node,
+        for polling with libzmq (base ZMQ library)
+        """
+        return utils.lib.zyre_socket_zmq(self._p)
 
     def print_py(self):
         """

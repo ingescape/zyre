@@ -721,6 +721,13 @@ zyre_socket (zyre_t *self)
     return self->inbox;
 }
 
+void *zyre_socket_zmq (zyre_t *self)
+{
+    assert (self);
+
+    return zsock_resolve (self->inbox);
+}
+
 
 //  --------------------------------------------------------------------------
 //  Prints zyre node information
@@ -1132,7 +1139,9 @@ zyre_test (bool verbose)
         zyre_destroy (&node5);
         zyre_destroy (&node6);
         zactor_destroy (&auth);
-
+#if defined (__WINDOWS__)
+    zsys_shutdown();
+#endif
         printf ("OK\n");
 
     }

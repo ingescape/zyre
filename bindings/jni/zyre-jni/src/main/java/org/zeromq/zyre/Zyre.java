@@ -7,14 +7,19 @@
 package org.zeromq.zyre;
 
 import org.zeromq.tools.ZmqNativeLoader;
+
+import java.util.LinkedHashMap;
+import java.util.Map;
 import org.zeromq.czmq.*;
 
 public class Zyre implements AutoCloseable {
     static {
-        ZmqNativeLoader.loadLibrary("zmq", true);
-        ZmqNativeLoader.loadLibrary("czmq", true);
-        ZmqNativeLoader.loadLibrary("zyre", true);
-        ZmqNativeLoader.loadLibrary("zyrejni", false);
+        Map<String, Boolean> libraries = new LinkedHashMap<>();
+        libraries.put("zmq", false);
+        libraries.put("czmq", false);
+        libraries.put("zyre", false);
+        libraries.put("zyrejni", false);
+        ZmqNativeLoader.loadLibraries(libraries);
     }
     public long self;
     /*
@@ -110,6 +115,20 @@ public class Zyre implements AutoCloseable {
         __setEvasiveTimeout (self, interval);
     }
     /*
+    Set the peer silence timeout, in milliseconds. Default is 5000.
+    This can be tuned in order to deal with expected network conditions
+    and the response time expected by the application. This is tied to
+    the beacon interval and rate of messages received.
+    Silence is triggered one second after the timeout if peer has not
+    answered ping and has not sent any message.
+    NB: this is currently redundant with the evasiveness timeout. Both
+    affect the same timeout value.
+    */
+    native static void __setSilentTimeout (long self, int interval);
+    public void setSilentTimeout (int interval) {
+        __setSilentTimeout (self, interval);
+    }
+    /*
     Set the peer expiration timeout, in milliseconds. Default is 30000.
     This can be tuned in order to deal with expected network conditions
     and the response time expected by the application. This is tied to
@@ -131,6 +150,8 @@ public class Zyre implements AutoCloseable {
     Set network interface for UDP beacons. If you do not set this, CZMQ will
     choose an interface for you. On boxes with several interfaces you should
     specify which one you want to use, or strange things can happen.
+    The interface may by specified by either the interface name e.g. "eth0" or
+    an IP address associalted with the interface e.g. "192.168.0.1"
     */
     native static void __setInterface (long self, String value);
     public void setInterface (String value) {
@@ -345,6 +366,14 @@ public class Zyre implements AutoCloseable {
     native static long __socket (long self);
     public Zsock socket () {
         return new Zsock (__socket (self));
+    }
+    /*
+    Return underlying ZMQ socket for talking to the Zyre node,
+    for polling with libzmq (base ZMQ library)
+    */
+    native static long __socketZmq (long self);
+    public long socketZmq () {
+        return __socketZmq (self);
     }
     /*
     Print zyre node information to stdout

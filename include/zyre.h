@@ -104,6 +104,8 @@ ZYRE_EXPORT void
 //  Set network interface for UDP beacons. If you do not set this, CZMQ will
 //  choose an interface for you. On boxes with several interfaces you should
 //  specify which one you want to use, or strange things can happen.
+//  The interface may by specified by either the interface name e.g. "eth0" or
+//  an IP address associalted with the interface e.g. "192.168.0.1"
 ZYRE_EXPORT void
     zyre_set_interface (zyre_t *self, const char *value);
 
@@ -274,6 +276,12 @@ ZYRE_EXPORT void
 //  Explicitly connect to a peer
 ZYRE_EXPORT int
     zyre_require_peer (zyre_t *self, const char *uuid, const char *endpoint, const char *public_key);
+
+//  *** Draft method, for development use, may change without warning ***
+//  Return underlying ZMQ socket for talking to the Zyre node,
+//  for polling with libzmq (base ZMQ library)
+ZYRE_EXPORT void *
+    zyre_socket_zmq (zyre_t *self);
 
 #endif // ZYRE_BUILD_DRAFT_API
 //  @end

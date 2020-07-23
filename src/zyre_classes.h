@@ -22,8 +22,20 @@
 //  Platform definitions, must come first
 #include "platform.h"
 
+//  Asserts check the invariants of methods. If they're not
+//  fulfilled the program should fail fast. Therefore enforce them!
+#ifdef NDEBUG
+  #undef NDEBUG
+  #include <assert.h>
+  #define NDEBUG
+#else
+  #include <assert.h>
+#endif
+
 //  External API
 #include "../include/zyre.h"
+
+//  Private external dependencies
 
 //  Opaque class structures to allow forward references
 #ifndef ZRE_MSG_T_DEFINED
@@ -110,6 +122,12 @@ ZYRE_PRIVATE void
 //  Explicitly connect to a peer
 ZYRE_PRIVATE int
     zyre_require_peer (zyre_t *self, const char *uuid, const char *endpoint, const char *public_key);
+
+//  *** Draft method, defined for internal use only ***
+//  Return underlying ZMQ socket for talking to the Zyre node,
+//  for polling with libzmq (base ZMQ library)
+ZYRE_PRIVATE void *
+    zyre_socket_zmq (zyre_t *self);
 
 //  *** Draft method, defined for internal use only ***
 //  Self test of this class.

@@ -103,6 +103,8 @@ type
   // Set network interface for UDP beacons. If you do not set this, CZMQ will
   // choose an interface for you. On boxes with several interfaces you should
   // specify which one you want to use, or strange things can happen.
+  // The interface may by specified by either the interface name e.g. "eth0" or
+  // an IP address associalted with the interface e.g. "192.168.0.1"
   procedure zyre_set_interface(self: PZyre; Value: PAnsiChar); cdecl; external lib_zyre {$IFDEF MSWINDOWS}delayed{$ENDIF};
 
   // By default, Zyre binds to an ephemeral TCP port and broadcasts the local
@@ -210,6 +212,10 @@ type
 
   // Return socket for talking to the Zyre node, for polling
   function zyre_socket(self: PZyre): PZsock; cdecl; external lib_zyre {$IFDEF MSWINDOWS}delayed{$ENDIF};
+
+  // Return underlying ZMQ socket for talking to the Zyre node,
+  // for polling with libzmq (base ZMQ library)
+  function zyre_socket_zmq(self: PZyre): PZSock; cdecl; external lib_zyre {$IFDEF MSWINDOWS}delayed{$ENDIF};
 
   // Print zyre node information to stdout
   procedure zyre_print(self: PZyre); cdecl; external lib_zyre {$IFDEF MSWINDOWS}delayed{$ENDIF};

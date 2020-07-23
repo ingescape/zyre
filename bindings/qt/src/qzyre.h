@@ -86,6 +86,8 @@ public:
     //  Set network interface for UDP beacons. If you do not set this, CZMQ will
     //  choose an interface for you. On boxes with several interfaces you should
     //  specify which one you want to use, or strange things can happen.
+    //  The interface may by specified by either the interface name e.g. "eth0" or
+    //  an IP address associalted with the interface e.g. "192.168.0.1"
     void setInterface (const QString &value);
 
     //  By default, Zyre binds to an ephemeral TCP port and broadcasts the local
@@ -193,6 +195,10 @@ public:
 
     //  Return socket for talking to the Zyre node, for polling
     QZsock * socket ();
+
+    //  Return underlying ZMQ socket for talking to the Zyre node,
+    //  for polling with libzmq (base ZMQ library)
+    void * socketZmq ();
 
     //  Print zyre node information to stdout
     void print ();
