@@ -1,3 +1,5 @@
+DEFINES += ZYRE_BUILD_DRAFT_API
+
 SOURCES += \
     $$PWD/../../src/zre_msg.c \
     $$PWD/../../src/zyre.c \
