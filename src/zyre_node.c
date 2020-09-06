@@ -921,7 +921,7 @@ zyre_node_remove_peer (zyre_node_t *self, zyre_peer_t *peer)
         zstr_sendx (self->gossip, "UNPUBLISH", zyre_peer_identity (peer), NULL);
     
     //  Restart election if leaving peer was leader in a group
-    const char *group_name = zlist_first (self->own_groups);
+    const char *group_name = (const char*) zlist_first (self->own_groups);
     while (group_name) {
         zyre_group_t *group = zyre_node_require_peer_group (self, group_name);
         assert(group);
@@ -943,7 +943,7 @@ zyre_node_remove_peer (zyre_node_t *self, zyre_peer_t *peer)
                 zyre_group_send (group, &election_msg);
             }
         }
-        group_name = zlist_next(self->own_groups);
+        group_name = (const char*) zlist_next(self->own_groups);
     }
 #endif
 
