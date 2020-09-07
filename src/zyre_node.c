@@ -921,7 +921,7 @@ zyre_node_remove_peer (zyre_node_t *self, zyre_peer_t *peer)
         zstr_sendx (self->gossip, "UNPUBLISH", zyre_peer_identity (peer), NULL);
     
     //  Restart election if leaving peer was leader in a group
-    const char *group_name = (const char*) zlist_first (self->own_groups);
+    const char *group_name = (const char *) zlist_first (self->own_groups);
     while (group_name) {
         zyre_group_t *group = zyre_node_require_peer_group (self, group_name);
         assert(group);
@@ -943,7 +943,7 @@ zyre_node_remove_peer (zyre_node_t *self, zyre_peer_t *peer)
                 zyre_group_send (group, &election_msg);
             }
         }
-        group_name = (const char*) zlist_next(self->own_groups);
+        group_name = (const char *) zlist_next (self->own_groups);
     }
 #endif
 
@@ -1129,6 +1129,7 @@ zyre_node_recv_peer (zyre_node_t *self)
         zlist_t *groups = zre_msg_groups (msg);
         const char *name = (const char *) zlist_first (groups);
         while (name) {
+#ifdef ZYRE_BUILD_DRAFT_API
             zyre_group_t *group = zyre_node_join_peer_group (self, peer, name);
             if (zyre_group_contest (zyre_node_require_peer_group (self, name))) {
                 //  Start election and if there's an active election, abort it
@@ -1149,6 +1150,9 @@ zyre_node_recv_peer (zyre_node_t *self)
                                self->name, name, zuuid_str (self->uuid));
                 zyre_group_send (group, &election_msg);
             }
+#else
+            zyre_node_join_peer_group (self, peer, name);
+#endif
             name = (const char *) zlist_next (groups);
         }
         //  Now take peer's status from HELLO, after joining groups
