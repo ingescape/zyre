@@ -1129,7 +1129,26 @@ zyre_node_recv_peer (zyre_node_t *self)
         zlist_t *groups = zre_msg_groups (msg);
         const char *name = (const char *) zlist_first (groups);
         while (name) {
-            zyre_node_join_peer_group (self, peer, name);
+            zyre_group_t *group = zyre_node_join_peer_group (self, peer, name);
+            if (zyre_group_contest (zyre_node_require_peer_group (self, name))) {
+                //  Start election and if there's an active election, abort it
+                zyre_election_t *election = zyre_group_election (group);
+                if (election) {
+                    //  Discard a running election because the number of peers change
+                    zyre_election_destroy (&election);
+                }
+                election = zyre_election_new ();
+                zyre_group_set_election (group, election);
+                
+                //  Start challenge for leadership
+                zyre_election_set_caw (election, strdup (zuuid_str (self->uuid)));
+                zre_msg_t *election_msg = zyre_election_build_elect_msg (election);
+                zre_msg_set_group (election_msg, name);
+                if (self->verbose)
+                    zsys_info ("(%s) [%s] send ELECT message - %s",
+                               self->name, name, zuuid_str (self->uuid));
+                zyre_group_send (group, &election_msg);
+            }
             name = (const char *) zlist_next (groups);
         }
         //  Now take peer's status from HELLO, after joining groups
