@@ -1,5 +1,9 @@
 DEFINES += ZYRE_BUILD_DRAFT_API
 
+win32 {
+    DEFINES += ZYRE_STATIC
+}
+
 SOURCES += \
     $$PWD/../../src/zre_msg.c \
     $$PWD/../../src/zyre.c \
