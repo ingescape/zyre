@@ -259,7 +259,7 @@ zyre_election_print (zyre_election_t *self) {
     printf ("    CAW: %s\n", self->caw);
     printf ("    election count: %d\n", self->erec);
     printf ("    leader count: %d\n", self->lrec);
-    printf ("    state: %s\n", !self->leader? "undecided": self->isLeader? "leader": "looser");
+    printf ("    state: %s\n", !self->leader? "undecided": self->isLeader? "leader": "loser");
     printf ("    leader: %s\n", self->leader);
     printf ("}\n");
 }
