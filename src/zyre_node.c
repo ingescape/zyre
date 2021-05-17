@@ -1132,8 +1132,8 @@ zyre_node_recv_peer (zyre_node_t *self)
         const char *name = (const char *) zlist_first (groups);
         while (name) {
 #ifdef ZYRE_BUILD_DRAFT_API
+            zyre_group_t *group = zyre_node_join_peer_group (self, peer, name);
             if (zyre_group_contest (zyre_node_require_peer_group (self, name))) {
-                zyre_group_t *group = zyre_node_join_peer_group (self, peer, name);
                 //  Start election and if there's an active election, abort it
                 zyre_election_t *election = zyre_group_election (group);
                 if (election) {
