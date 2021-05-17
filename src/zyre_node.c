@@ -935,6 +935,7 @@ zyre_node_remove_peer (zyre_node_t *self, zyre_peer_t *peer)
             }
             election = zyre_election_new ();
             zyre_group_set_election (group, election);
+            zyre_group_set_leader(group, NULL);
             //  Start challenge for leadership
             zyre_election_set_caw (election, strdup (zuuid_str (self->uuid)));
             zre_msg_t *election_msg = zyre_election_build_elect_msg (election);
@@ -1141,6 +1142,7 @@ zyre_node_recv_peer (zyre_node_t *self)
                 }
                 election = zyre_election_new ();
                 zyre_group_set_election (group, election);
+                zyre_group_set_leader(group, NULL);
                 
                 //  Start challenge for leadership
                 zyre_election_set_caw (election, strdup (zuuid_str (self->uuid)));
@@ -1198,6 +1200,7 @@ zyre_node_recv_peer (zyre_node_t *self)
                 }
                 election = zyre_election_new ();
                 zyre_group_set_election (group, election);
+                zyre_group_set_leader(group, NULL);
 
                 //  Start challenge for leadership
                 zyre_election_set_caw (election, strdup (zuuid_str (self->uuid)));
@@ -1228,7 +1231,8 @@ zyre_node_recv_peer (zyre_node_t *self)
                         }
                         election = zyre_election_new ();
                         zyre_group_set_election (group, election);
-                        
+                        zyre_group_set_leader(group, NULL);
+
                         //  Start challenge for leadership
                         zyre_election_set_caw (election, strdup (zuuid_str (self->uuid)));
                         zre_msg_t *election_msg = zyre_election_build_elect_msg (election);
@@ -1342,12 +1346,13 @@ zyre_node_recv_peer (zyre_node_t *self)
                 else {
                     //  Peer is leader
                     zyre_peer_t *leader_peer = (zyre_peer_t *) zhash_lookup (self->peers, zyre_election_leader (election));
-                    zyre_group_set_leader (group, leader_peer);
-                    assert (leader_peer);
-                    zyre_node_leader_peer_group (self,
-                                                 zyre_peer_identity (leader_peer),
-                                                 zyre_peer_name (leader_peer),
-                                                 zre_msg_group (msg));
+                    if (leader_peer) {
+                        zyre_group_set_leader (group, leader_peer);
+                        zyre_node_leader_peer_group (self,
+                                                     zyre_peer_identity (leader_peer),
+                                                     zyre_peer_name (leader_peer),
+                                                     zre_msg_group (msg));
+                    }
                 }
                 
                 if (self->verbose)
