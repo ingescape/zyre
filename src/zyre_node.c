@@ -924,11 +924,16 @@ zyre_node_remove_peer (zyre_node_t *self, zyre_peer_t *peer)
     const char *group_name = (const char *) zlist_first (self->own_groups);
     while (group_name) {
         zyre_group_t *group = zyre_node_require_peer_group (self, group_name);
+        zyre_election_t *election = zyre_group_election (group);
         zyre_peer_t *group_leader = zyre_group_leader (group);
-        if (zyre_group_contest (group) && group_leader
-            && streq (zyre_peer_identity (group_leader), zyre_peer_identity (peer))) {
+        bool leader_left =
+                group_leader
+                && streq (zyre_peer_identity (group_leader), zyre_peer_identity (peer));
+        if (zyre_group_contest (group)
+            && (!election
+                || !zyre_election_lrec_complete(election, group)
+                || leader_left)) {
             // leader left: start elections in group
-            zyre_election_t *election = zyre_group_election (group);
             if (election) {
                 //  Discard running election because the number of peers changed
                 zyre_election_destroy (&election);
