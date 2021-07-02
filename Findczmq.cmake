@@ -25,7 +25,7 @@ find_path (
 
 find_library (
     CZMQ_LIBRARIES
-    NAMES libczmq czmq
+    NAMES czmq libczmq
     HINTS ${PC_CZMQ_LIBRARY_HINTS}
 )
 
