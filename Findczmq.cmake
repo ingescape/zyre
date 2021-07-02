@@ -4,7 +4,7 @@
 ################################################################################
 
 if (NOT MSVC)
-    find_package(PkgConfig)
+    include(FindPkgConfig)
     pkg_check_modules(PC_CZMQ "libczmq")
     if (PC_CZMQ_FOUND)
         # add CFLAGS from pkg-config file, e.g. draft api.
@@ -18,13 +18,13 @@ if (NOT MSVC)
 endif (NOT MSVC)
 
 find_path (
-    ${CMAKE_FIND_PACKAGE_NAME}_INCLUDE_DIRS
+    CZMQ_INCLUDE_DIRS
     NAMES czmq.h
     HINTS ${PC_CZMQ_INCLUDE_HINTS}
 )
 
 find_library (
-    ${CMAKE_FIND_PACKAGE_NAME}_LIBRARIES
+    CZMQ_LIBRARIES
     NAMES libczmq czmq
     HINTS ${PC_CZMQ_LIBRARY_HINTS}
 )
@@ -32,12 +32,12 @@ find_library (
 include(FindPackageHandleStandardArgs)
 
 find_package_handle_standard_args(
-    ${CMAKE_FIND_PACKAGE_NAME}
-    REQUIRED_VARS ${CMAKE_FIND_PACKAGE_NAME}_LIBRARIES ${CMAKE_FIND_PACKAGE_NAME}_INCLUDE_DIRS
+    CZMQ
+    REQUIRED_VARS CZMQ_LIBRARIES CZMQ_INCLUDE_DIRS
 )
 mark_as_advanced(
-    ${CMAKE_FIND_PACKAGE_NAME}_FOUND
-    ${CMAKE_FIND_PACKAGE_NAME}_LIBRARIES ${CMAKE_FIND_PACKAGE_NAME}_INCLUDE_DIRS
+    CZMQ_FOUND
+    CZMQ_LIBRARIES CZMQ_INCLUDE_DIRS
 )
 
 ################################################################################
