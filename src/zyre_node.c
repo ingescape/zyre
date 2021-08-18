@@ -313,7 +313,7 @@ zyre_node_stop (zyre_node_t *self)
             peer = (zyre_peer_t *) zhash_next (self->peers);
         }
     }
-    
+
     if (self->beacon) {
         //  Stop broadcast/listen beacon
         beacon_t beacon;
@@ -331,7 +331,7 @@ zyre_node_stop (zyre_node_t *self)
         zpoller_remove (self->poller, self->beacon);
         zactor_destroy (&self->beacon);
     }
-    
+
     //  Stop polling on inbox and stop outbox
     zpoller_remove (self->poller, self->inbox);
     zstr_sendm (self->outbox, "STOP");
@@ -914,12 +914,12 @@ zyre_node_remove_peer (zyre_node_t *self, zyre_peer_t *peer)
     zstr_sendm (self->outbox, "EXIT");
     zstr_sendm (self->outbox, zyre_peer_identity (peer));
     zstr_send (self->outbox, zyre_peer_name (peer));
-    
+
 #ifdef ZYRE_BUILD_DRAFT_API
     //  Clean this peer in our gossip table if needed
     if (self->gossip)
         zstr_sendx (self->gossip, "UNPUBLISH", zyre_peer_identity (peer), NULL);
-    
+
     //  Restart election if leaving peer was leader in a group
     const char *group_name = (const char *) zlist_first (self->own_groups);
     while (group_name) {
@@ -1148,7 +1148,6 @@ zyre_node_recv_peer (zyre_node_t *self)
                 election = zyre_election_new ();
                 zyre_group_set_election (group, election);
                 zyre_group_set_leader(group, NULL);
-                
                 //  Start challenge for leadership
                 zyre_election_set_caw (election, strdup (zuuid_str (self->uuid)));
                 zre_msg_t *election_msg = zyre_election_build_elect_msg (election);
@@ -1245,7 +1244,6 @@ zyre_node_recv_peer (zyre_node_t *self)
                         if (self->verbose)
                             zsys_info ("(%s) [%s] send ELECT message - %s",
                                 self->name, zre_msg_group (msg), zuuid_str (self->uuid));
-                        
                         zyre_group_send (group, &election_msg);
                     }
                 }
@@ -1319,14 +1317,12 @@ zyre_node_recv_peer (zyre_node_t *self)
         zyre_election_t *election = zyre_group_require_election (group);
         assert (election);
         const char *leader = zre_msg_leader_id (msg);
-        
         const char *caw = zyre_election_caw(election);
         if (caw) {
             // Only propagate if not leader
             if (strneq (zuuid_str (self->uuid), leader) && !zyre_election_lrec_started (election)) {
                 zre_msg_t *leader_msg = zyre_election_build_leader_msg (election);
                 zre_msg_set_group (leader_msg, zre_msg_group (msg));
-                
                 //  Send leader message to all neighbors
                 zyre_group_send (group, &leader_msg);
                 if (self->verbose)
@@ -1338,7 +1334,6 @@ zyre_node_recv_peer (zyre_node_t *self)
             if (self->verbose)
                 zsys_info ("(%s) [%s] Received LEADER - %s\n",
                            self->name, zre_msg_group (msg), zuuid_str (self->uuid));
-            
             // Check if election is finished
             if (zyre_election_lrec_complete (election, group)) {
                 if (streq (zyre_election_leader (election), zuuid_str (self->uuid))) {
@@ -1359,12 +1354,10 @@ zyre_node_recv_peer (zyre_node_t *self)
                                                      zre_msg_group (msg));
                     }
                 }
-                
                 if (self->verbose)
                     zsys_info ("(%s) [%s] Election finished %s, %s!\n",
                                self->name, zre_msg_group (msg), zuuid_str (self->uuid),
                                streq (zyre_election_leader (election), zuuid_str (self->uuid))? "LEADER": "FOLLOWER");
-                
                 zyre_election_destroy (&election);
                 zyre_group_set_election (group, NULL);
             }
@@ -1373,7 +1366,7 @@ zyre_node_recv_peer (zyre_node_t *self)
             zsys_warning ("Received ZRE_MSG_LEADER but we have no CAW, election has been reset before all peers could terminate the previous one : ignoring this message");
         }
     }
-    
+
     else
     if (zre_msg_id (msg) == ZRE_MSG_GOODBYE) {
         //  If discovery mode is UDP, beacons do the job for peer removal (see zyre_node_recv_beacon)
@@ -1383,7 +1376,7 @@ zyre_node_recv_peer (zyre_node_t *self)
             peer = NULL;
         }
     }
-    
+
     zuuid_destroy (&uuid);
     zre_msg_destroy (&msg);
 
