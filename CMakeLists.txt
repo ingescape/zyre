@@ -460,9 +460,11 @@ target_link_libraries(
     ${OPTIONAL_LIBRARIES_STATIC}
 )
 endif()
-install(TARGETS zpinger
-    RUNTIME DESTINATION bin
-)
+if (NOT ${CMAKE_SYSTEM_NAME} STREQUAL "iOS")
+  install(TARGETS zpinger
+      RUNTIME DESTINATION bin
+  )
+endif()
 add_executable(
     ztester_beacon
     "${SOURCE_DIR}/src/ztester_beacon.c"
