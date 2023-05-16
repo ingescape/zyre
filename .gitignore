@@ -134,3 +134,4 @@ nbproject/
 # editor backups
 *~
 builds/xcode/*
+examples/chat/Debug/
