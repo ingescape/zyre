@@ -381,7 +381,7 @@ install(
 ########################################################################
 include(CMakePackageConfigHelpers)
 if (WIN32)
-  set(ZYRE_CMAKECONFIG_INSTALL_DIR "CMake" CACHE STRING "install path for zyreConfig.cmake")
+  set(CMAKECONFIG_INSTALL_DIR "CMake" CACHE STRING "install path for zyreConfig.cmake")
 else()
   set(CMAKECONFIG_INSTALL_DIR "${CMAKE_INSTALL_LIBDIR}/cmake/zyre" CACHE STRING "install path for zyreConfig.cmake")
 endif()
@@ -392,16 +392,16 @@ if (NOT CMAKE_VERSION VERSION_LESS 3.0)
 endif()
 configure_package_config_file(builds/cmake/Config.cmake.in
                               "${CMAKE_CURRENT_BINARY_DIR}/zyreConfig.cmake"
-                              INSTALL_DESTINATION ${ZYRE_CMAKECONFIG_INSTALL_DIR})
+                              INSTALL_DESTINATION ${CMAKECONFIG_INSTALL_DIR})
 write_basic_package_version_file(${CMAKE_CURRENT_BINARY_DIR}/zyreConfigVersion.cmake
                                  VERSION ${ZYRE_VERSION}
                                  COMPATIBILITY AnyNewerVersion)
 install(EXPORT zyre-targets
         FILE zyreTargets.cmake
-        DESTINATION ${ZYRE_CMAKECONFIG_INSTALL_DIR})
+        DESTINATION ${CMAKECONFIG_INSTALL_DIR})
 install(FILES ${CMAKE_CURRENT_BINARY_DIR}/zyreConfig.cmake
               ${CMAKE_CURRENT_BINARY_DIR}/zyreConfigVersion.cmake
-              DESTINATION ${ZYRE_CMAKECONFIG_INSTALL_DIR})
+              DESTINATION ${CMAKECONFIG_INSTALL_DIR})
 
 ########################################################################
 # executables
